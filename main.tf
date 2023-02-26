@@ -42,8 +42,27 @@ resource "aws_security_group" "jenkins-sg-2022" {
   }
 }
 
+data "aws_ami" "linux_instance" {
+    most_recent = "true"
+    owners = ["amazon"]
+    filter {
+      name = "name"
+      values = [ "amzn2-ami-kernel-5.10-hvm-2.0.20230119.1-x86_64-gp2" ]
+    }
+
+    filter {
+      name = "architecture"
+      values = [ "x86_64" ]
+    }
+
+    filter {
+      name = "virtualization-type"
+      values = [ "hvm" ]
+    }
+}
+
 resource "aws_instance" "myFirstInstance" {
-  ami           = var.ami_id
+  ami           = "${data.aws_ami.linux_instance.id}"
   key_name = var.key_name
   instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.jenkins-sg-2022.id]
